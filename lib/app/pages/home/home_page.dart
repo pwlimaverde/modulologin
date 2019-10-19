@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:modulologin/shared/rotas.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -13,7 +14,17 @@ class _HomePageState extends State<HomePage> {
         title: Text("Home"),
       ),
       body: Column(
-        children: <Widget>[],
+        children: <Widget>[
+          Icon(Icons.dashboard),
+          RaisedButton(
+                  color: Theme.of(context).primaryColor,
+                  textColor: Colors.white,
+                  child: Text("Login"),
+                  onPressed: () {
+                    print("clicou");
+                    navLoginPage(context);
+                  }),
+        ],
       ),
     );
   }
