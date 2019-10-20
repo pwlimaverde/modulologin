@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:modulologin/shared/rotas.dart';
+import 'package:modulologin/app/app_module.dart';
+import 'package:modulologin/app/pages/login/login_page.dart';
+import 'package:modulologin/app/pages/login/model/login_model.dart';
+import 'package:modulologin/app/shared/bloc/user_bloc.dart';
+import 'package:modulologin/app/shared/rotas.dart';
+
+
+final loginBloc = AppModule.to.getBloc<UserBloc>();
+final LoginModel model = loginBloc.model;
 
 class HomePage extends StatefulWidget {
   @override
@@ -21,11 +29,67 @@ class _HomePageState extends State<HomePage> {
                   textColor: Colors.white,
                   child: Text("Login"),
                   onPressed: () {
-                    print("clicou");
                     navLoginPage(context);
                   }),
+          RaisedButton(
+                  color: Theme.of(context).primaryColor,
+                  textColor: Colors.white,
+                  child: Text("Logout"),
+                  onPressed: () {
+                    loginBloc.logout();
+                  }),
+          Column(
+            children: <Widget>[
+              FutureBuilder(
+                future: getData(),
+                builder: (context, snapshot){
+                  if(snapshot.hasError){
+                    return Text("Tem erro Future");
+                  }
+                  if(!snapshot.hasData){
+                    print("Não tem dados futuro");
+                    return RaisedButton(
+                            color: Theme.of(context).primaryColor,
+                            textColor: Colors.white,
+                            child: Text("Login"),
+                            onPressed: () {
+                              navLoginPage(context);
+                            });
+                  }
+                  return getTxt(context);
+                }
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 }
+
+getTxt(context){
+  try{
+    return StreamBuilder<List<LoginModel>>(
+      stream: loginBloc.usersListOut,
+      builder: (context, snapshot) {
+        if(snapshot.hasError){
+          return Text("Tem erro");
+        }
+        if(!snapshot.hasData){
+          print("Não tem dados");
+          return CircularProgressIndicator();
+        }
+        final List<LoginModel> model = snapshot.data;
+        return Text("O token é ${model[0].token}");
+      }
+    );
+  }catch(e){
+    return Text("Não está logado");
+  }
+}
+
+getData() async {
+  var login = await model.username;
+  return login;
+}
+

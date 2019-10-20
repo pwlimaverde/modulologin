@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:modulologin/app/pages/login/login_bloc.dart';
-import 'package:modulologin/app/pages/login/login_module.dart';
+import 'package:modulologin/app/app_module.dart';
 import 'package:modulologin/app/pages/login/login_repository.dart';
-import 'package:modulologin/shared/estilos.dart';
-import 'package:modulologin/shared/rotas.dart';
+import 'package:modulologin/app/shared/bloc/user_bloc.dart';
+import 'package:modulologin/app/shared/estilos.dart';
+import 'package:modulologin/app/shared/rotas.dart';
 
-final loginBloc = LoginModule.to.bloc<LoginBloc>();
+final loginBloc = AppModule.to.getBloc<UserBloc>();
 final loginModel = loginBloc.model;
 
 final _formKey = GlobalKey<FormState>();

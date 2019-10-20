@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:dio/dio.dart';
-import 'package:modulologin/app/pages/login/login_bloc.dart';
-import 'package:modulologin/app/pages/login/login_module.dart';
+import 'package:modulologin/app/app_module.dart';
 import 'package:modulologin/app/pages/login/model/login_model.dart';
-import 'package:modulologin/shared/constants.dart';
+import 'package:modulologin/app/shared/bloc/user_bloc.dart';
+import 'package:modulologin/app/shared/constants.dart';
 
-final loginBloc = LoginModule.to.getBloc<LoginBloc>();
+
+final loginBloc = AppModule.to.getBloc<UserBloc>();
 var model = loginBloc.model;
 
 class LoginRepository extends Disposable {

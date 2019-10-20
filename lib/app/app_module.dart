@@ -1,3 +1,4 @@
+import 'package:modulologin/app/shared/bloc/user_bloc.dart';
 import 'package:modulologin/app/app_bloc.dart';
 import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:modulologin/app/app_widget.dart';
 class AppModule extends ModuleWidget {
   @override
   List<Bloc> get blocs => [
+        Bloc((i) => UserBloc()),
         Bloc((i) => AppBloc()),
       ];
 
