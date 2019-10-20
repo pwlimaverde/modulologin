@@ -49,4 +49,9 @@ class LoginApi {
     }
     return model;
   }
+
+  @override
+  void dispose() {
+
+  }
 }
