@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:modulologin/app/app_module.dart';
-import 'package:modulologin/app/pages/login/model/login_model.dart';
-import 'package:modulologin/app/shared/bloc/user_bloc.dart';
-import 'package:modulologin/app/shared/rotas.dart';
+import 'package:modulologin/app/shared/mod_login/mod_login_bloc.dart';
+import 'package:modulologin/app/shared/mod_login/model/mod_login_model.dart';
+import 'package:modulologin/app/shared/mod_login/utilitario/rotas_login.dart';
 
 
-final loginBloc = AppModule.to.getBloc<UserBloc>();
-final LoginModel model = loginBloc.model;
+final modLoginBloc = AppModule.to.getBloc<ModLoginBloc>();
+final ModLoginModel model = modLoginBloc.model;
 
 class HomePage extends StatefulWidget {
   @override
@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
                   textColor: Colors.white,
                   child: Text("Logout"),
                   onPressed: () {
-                    loginBloc.logout();
+                      modLoginBloc.logout();
                   }),
           Column(
             children: <Widget>[
@@ -68,8 +68,8 @@ class _HomePageState extends State<HomePage> {
 
 getTxt(context){
   try{
-    return StreamBuilder<List<LoginModel>>(
-      stream: loginBloc.usersListOut,
+    return StreamBuilder<List<ModLoginModel>>(
+      stream: modLoginBloc.usersListOut,
       builder: (context, snapshot) {
         if(snapshot.hasError){
           print(snapshot.data);
@@ -81,7 +81,7 @@ getTxt(context){
           print("Não tem dados");
           return CircularProgressIndicator();
         }
-        final List<LoginModel> model = snapshot.data;
+        final List<ModLoginModel> model = snapshot.data;
         try{
           return Text("O token é ${model[0].token}");
         }catch(e){
