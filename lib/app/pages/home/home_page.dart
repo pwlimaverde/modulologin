@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:modulologin/app/app_module.dart';
-import 'package:modulologin/app/pages/login/login_page.dart';
 import 'package:modulologin/app/pages/login/model/login_model.dart';
 import 'package:modulologin/app/shared/bloc/user_bloc.dart';
 import 'package:modulologin/app/shared/rotas.dart';
@@ -73,14 +72,21 @@ getTxt(context){
       stream: loginBloc.usersListOut,
       builder: (context, snapshot) {
         if(snapshot.hasError){
-          return Text("Tem erro");
+          print(snapshot.data);
+          print("erro");
+          return CircularProgressIndicator();
         }
         if(!snapshot.hasData){
+          print(snapshot.data);
           print("Não tem dados");
           return CircularProgressIndicator();
         }
         final List<LoginModel> model = snapshot.data;
-        return Text("O token é ${model[0].token}");
+        try{
+          return Text("O token é ${model[0].token}");
+        }catch(e){
+          return Text("não está logado");
+        }
       }
     );
   }catch(e){
