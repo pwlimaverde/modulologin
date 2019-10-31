@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:modulologin/app/app_module.dart';
 import 'package:modulologin/app/shared/mod_login/mod_login_bloc.dart';
-import 'package:modulologin/app/shared/mod_login/model/mod_login_model.dart';
 
 final modLoginBloc = AppModule.to.getBloc<ModLoginBloc>();
-final ModLoginModel model = modLoginBloc.model;
 
 class HomePage extends StatefulWidget {
   @override
@@ -18,7 +16,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text("Home"),
         actions: <Widget>[
-            modLoginBloc.buttonLoginA(),
+            modLoginBloc.buttonLogin(),
         ],
       ),
       body: Column(

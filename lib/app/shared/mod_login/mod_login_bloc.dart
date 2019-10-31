@@ -1,153 +1,125 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/material.dart';
 import 'package:modulologin/app/shared/mod_login/mod_login_repository.dart';
-import 'package:modulologin/app/shared/mod_login/model/mod_login_model.dart';
 import 'package:modulologin/app/shared/mod_login/utilitario/alert.dart';
 import 'package:modulologin/app/shared/mod_login/utilitario/estilos.dart';
 import 'package:modulologin/app/shared/mod_login/utilitario/rotas_login.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ModLoginBloc extends BlocBase {
-  final ModLoginModel model = ModLoginModel();
   final _formKey = GlobalKey<FormState>();
   final _crtlLogin = TextEditingController();
   final _crtlSenha = TextEditingController();
+  final storage = FlutterSecureStorage();
 
-  BehaviorSubject<List<ModLoginModel>> _usersListController =
-      BehaviorSubject.seeded([]);
-  Observable<List<ModLoginModel>> get usersListOut =>
-      _usersListController.stream;
+  BehaviorSubject<String> _usersListController = BehaviorSubject.seeded(null);
+  Observable<String> get usersListOut => _usersListController.stream;
 
-  addNovoLogin(ModLoginModel model) {
-    _usersListController.value.add(model);
+  addNovoLogin(String user) {
+    _usersListController.add(user);
     _usersListController.add(_usersListController.value);
   }
 
-  void logout() {
-    _usersListController.add([]);
-    model.token = null;
-    model.username = null;
-    model.password = null;
+  void _logout() async {
+    await storage.deleteAll();
+    _usersListController.add(null);
   }
 
-  buttonLoginA() {
+  _getData() async {
+    String login = await storage.read(key: "username");
+    return login;
+  }
+
+  _loginButton(context) {
+    return Row(
+      children: <Widget>[
+        Center(
+          child: IconButton(
+            icon: Icon(Icons.people),
+            onPressed: () {
+              navLoginPage(context);
+            },
+          ),
+        ),
+        Container(
+          height: 10,
+          width: 10,
+        ),
+      ],
+    );
+  }
+
+  _logoutButton(user){
+    return Row(
+      children: <Widget>[
+        Icon(Icons.account_box),
+        Container(
+          height: 10,
+          width: 10,
+        ),
+        Text("Bem vindo $user"),
+        Center(
+          child: IconButton(
+            icon: Icon(Icons.input),
+            onPressed: () {
+              _logout();
+            },
+          ),
+        ),
+        Container(
+          height: 10,
+          width: 10,
+        ),
+      ],
+    );
+  }
+
+  buttonLogin() {
     return FutureBuilder(
-        future: _getDataA(),
+        future: _getData(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Row(
-              children: <Widget>[
-                Center(
-                  child: IconButton(
-                    icon: Icon(Icons.people),
-                    onPressed: () {
-                      navLoginPage(context);
-                    },
-                  ),
-                ),
-                Center(child: Text("Login")),
-                Container(
-                  height: 10,
-                ),
-              ],
-            );
+            print("condição 1 - tem erro");
+            return _loginButton(context);
           }
           if (!snapshot.hasData) {
-            return Row(
-              children: <Widget>[
-                Center(
-                  child: IconButton(
-                    icon: Icon(Icons.people),
-                    onPressed: () {
-                      navLoginPage(context);
-                    },
-                  ),
-                ),
-                Center(child: Text("Login")),
-                Container(
-                  height: 10,
-                  width: 10,
-                ),
-              ],
-            );
+            print("condição 2 - não tem dados");
+            return _loginButton(context);
           }
-          return _getOkA(context);
+          return _getOkB(context);
         });
   }
 
-  _getOkA(context) {
+  _getOkB(context) {
     try {
-      return StreamBuilder<List<ModLoginModel>>(
+      return StreamBuilder<String>(
           stream: usersListOut,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return CircularProgressIndicator();
+              print("condição 3 - stream tem erro");
+              return _loginButton(context);
             }
             if (!snapshot.hasData) {
-              return CircularProgressIndicator();
+              print("condição 4 - stream não tem data");
+              return _loginButton(context);
             }
-            final List<ModLoginModel> model = snapshot.data;
+            final user = snapshot.data;
+            if (snapshot.data == null) {
+              print("condição 5 - stream tem data vasio");
+              return _loginButton(context);
+            }
             try {
-              return Row(
-                children: <Widget>[
-                  Icon(Icons.account_box),
-                  Text("Bem vindo ${model[0].username}"),
-                  Center(
-                    child: IconButton(
-                      icon: Icon(Icons.input),
-                      onPressed: () {
-                        logout();
-                      },
-                    ),
-                  ),
-                  Container(
-                    height: 10,
-                    width: 10,
-                  ),
-                ],
-              );
+              print("condição 6 - stream tem data try");
+              return  _logoutButton(user);
             } catch (e) {
-              return Row(
-                children: <Widget>[
-                  Center(
-                    child: IconButton(
-                      icon: Icon(Icons.people),
-                      onPressed: () {
-                        navLoginPage(context);
-                      },
-                    ),
-                  ),
-                  Center(child: Text("Login")),
-                  Container(
-                    height: 10,
-                  ),
-                ],
-              );
+              return _loginButton(context);
             }
           });
     } catch (e) {
-      return Row(
-        children: <Widget>[
-          Center(
-            child: IconButton(
-              icon: Icon(Icons.people),
-              onPressed: () {
-                navLoginPage(context);
-              },
-            ),
-          ),
-          Center(child: Text("Login")),
-          Container(
-            height: 10,
-          ),
-        ],
-      );
+      print("condição 7 - stream tem data catch");
+      return _loginButton(context);
     }
-  }
-
-  _getDataA() async {
-    var login = await model.username;
-    return login;
   }
 
   widgetLogin(context) {
@@ -282,58 +254,6 @@ class ModLoginBloc extends BlocBase {
     }
   }
 
-//  _buttonLogin(context) {
-//    return RaisedButton(
-//        color: Theme.of(context).primaryColor,
-//        textColor: Colors.white,
-//        child: Row(
-//          children: <Widget>[
-//            Container(
-//              width: 10,
-//            ),
-//            Container(
-//              height: 20,
-//              child: Image.asset("imagens/iconlogin.png", fit: BoxFit.contain),
-//            ),
-//            Container(
-//              width: 10,
-//            ),
-//            Container(height: 20, child: Text("Fazer Login")),
-//            Container(
-//              width: 10,
-//            ),
-//          ],
-//        ),
-//        onPressed: () {
-//          print("clicou");
-//          navLoginPage(context);
-//        });
-//  }
-//
-//  _buttonLogout(context) {
-//    return RaisedButton(
-//        color: Theme.of(context).primaryColor,
-//        textColor: Colors.white,
-//        child: Row(
-//          children: <Widget>[
-//            Container(
-//              width: 10,
-//            ),
-//            Icon(Icons.input),
-//            Container(
-//              width: 10,
-//            ),
-//            Text("Logout"),
-//            Container(
-//              width: 10,
-//            ),
-//          ],
-//        ),
-//        onPressed: () {
-//          print("clicou");
-//          modLoginBloc.logout();
-//        });
-//  }
 
   @override
   void dispose() {
