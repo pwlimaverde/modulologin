@@ -1,16 +1,18 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:modulologin/app/app_module.dart';
 import 'package:modulologin/app/shared/mod_login/mod_login_bloc.dart';
 import 'package:modulologin/app/shared/mod_login/utilitario/constants.dart';
+import 'package:modulologin/app/shared/mod_login/utilitario/alert.dart';
 
 
 final modLoginBloc = AppModule.to.getBloc<ModLoginBloc>();
 
 
 class LoginApi {
-  static Future<String> loginUsers(String username, String password) async {
-
+  static Future<String> loginUsers(context, String username, String password) async {
+    alertProgress(context, "Aguarde");
     var userLogado;
     var url = BASE_URL;
     var urlToken = TOKEN_URL;
@@ -35,11 +37,12 @@ class LoginApi {
     } else {
       userLogado = null;
     }
+    Navigator.pop(context);
     return userLogado;
   }
 
   @override
   void dispose() {
-
+  LoginApi().dispose();
   }
 }

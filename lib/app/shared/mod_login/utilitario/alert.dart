@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-alert(BuildContext context, String msg){
+alertLogin(BuildContext context, String msg){
     showDialog(
         context: context,
         builder: (context){
@@ -17,5 +17,20 @@ alert(BuildContext context, String msg){
                 ],
             );
     }
+    );
+}
+
+alertProgress(BuildContext context, String msg){
+    showDialog(
+            context: context,
+            builder: (context){
+                return AlertDialog(
+                    title: Text("Conectando..."),
+                    content: Text(msg),
+                    actions: <Widget>[
+                        CircularProgressIndicator(),
+                    ],
+                );
+            }
     );
 }

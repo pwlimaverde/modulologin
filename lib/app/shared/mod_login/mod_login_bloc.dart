@@ -87,39 +87,23 @@ class ModLoginBloc extends BlocBase {
             print("condição 2 - não tem dados");
             return _loginButton(context);
           }
+          print("condição 3 - tem dados");
           return _getOkB(context);
         });
   }
 
   _getOkB(context) {
-    try {
-      return StreamBuilder<String>(
-          stream: usersListOut,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              print("condição 3 - stream tem erro");
+    return StreamBuilder<String>(
+            stream: usersListOut,
+            builder: (context, snapshot) {
+              final user = snapshot.data;
+              if (snapshot.hasData) {
+                print("condição ok - stream tem data");
+                return _logoutButton(user);
+              }
+              print("condição errada - stream sem data");
               return _loginButton(context);
-            }
-            if (!snapshot.hasData) {
-              print("condição 4 - stream não tem data");
-              return _loginButton(context);
-            }
-            final user = snapshot.data;
-            if (snapshot.data == null) {
-              print("condição 5 - stream tem data vasio");
-              return _loginButton(context);
-            }
-            try {
-              print("condição 6 - stream tem data try");
-              return  _logoutButton(user);
-            } catch (e) {
-              return _loginButton(context);
-            }
-          });
-    } catch (e) {
-      print("condição 7 - stream tem data catch");
-      return _loginButton(context);
-    }
+            });
   }
 
   widgetLogin(context) {
@@ -130,24 +114,26 @@ class ModLoginBloc extends BlocBase {
       body: Center(
         child: SingleChildScrollView(
           child: Container(
-//            color: Colors.white,
             padding: const EdgeInsets.all(40),
-            child: Column(
-              children: <Widget>[
-                SizedBox(
-                  height: 100,
-                  child:
-                      Image.asset("imagens/iconlogin.png", fit: BoxFit.contain),
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                _loginField(context, style),
-                SizedBox(
-                  height: 40,
-                ),
-                _confirmeLogin(context, style),
-              ],
+            child: Container(
+              width: 350,
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 100,
+                    child:
+                        Image.asset("imagens/iconlogin.png", fit: BoxFit.contain),
+                  ),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  _loginField(context, style),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  _confirmeLogin(context, style),
+                ],
+              ),
             ),
           ),
         ),
@@ -244,13 +230,13 @@ class ModLoginBloc extends BlocBase {
     String username = _crtlLogin.text;
     String password = _crtlSenha.text;
 
-    var usuarioLogado = await LoginApi.loginUsers(username, password);
+    var usuarioLogado = await LoginApi.loginUsers(context, username, password);
     if (usuarioLogado != null) {
       print("logou");
       Navigator.pop(context);
       navHomePage(context);
     } else {
-      alert(context, "Login Inválido");
+      alertLogin(context, "Login Inválido");
     }
   }
 
